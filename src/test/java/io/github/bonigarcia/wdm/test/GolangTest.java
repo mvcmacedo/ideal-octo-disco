@@ -17,20 +17,25 @@
 
 package io.github.bonigarcia.wdm.test;
 
-import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
-import static org.openqa.selenium.support.ui.ExpectedConditions.presenceOfElementLocated;
-import static org.openqa.selenium.support.ui.ExpectedConditions.textToBePresentInElementLocated;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+
+import static org.openqa.selenium.support.ui.ExpectedConditions.*;
+
 
 /**
  * Test with Chrome.
@@ -38,7 +43,7 @@ import io.github.bonigarcia.wdm.WebDriverManager;
  * @author Boni Garcia (boni.gg@gmail.com)
  * @since 1.0.0
  */
-public class ChromeTest {
+public class GolangTest {
 
     private WebDriver driver;
 
@@ -60,19 +65,43 @@ public class ChromeTest {
     }
 
     @Test
-    public void test() {
-        // Your test code here. For example:
+    public void testGolangWebsiteCodeExecution() {
         WebDriverWait wait = new WebDriverWait(driver, 30);
-        driver.get("https://en.wikipedia.org/wiki/Main_Page");
-        By searchInput = By.id("searchInput");
-        wait.until(presenceOfElementLocated(searchInput));
-        driver.findElement(searchInput).sendKeys("Software");
-        By searchButton = By.id("searchButton");
+
+        driver.get("https://golang.org");
+
+        By searchButton = By.className("js-playgroundRunEl");
+
         wait.until(elementToBeClickable(searchButton));
+
         driver.findElement(searchButton).click();
 
         wait.until(textToBePresentInElementLocated(By.tagName("body"),
-                "Computer software"));
+                "Hello, 世界"));
     }
 
+    @Test
+    public void testGolangPlaygroundExecution() {
+        WebDriverWait wait = new WebDriverWait(driver, 30);
+
+        driver.get("https://play.golang.org/");
+
+        By textArea = By.id("code");
+        driver.findElement(textArea).clear();
+        driver.findElement(textArea).sendKeys("package main\n" +
+                "\n" +
+                "import (\n" +
+                "\t\"fmt\"\n" +
+                ")\n" +
+                "\n" +
+                "func main() {\n" +
+                "\tfmt.Println(\"This is only a test!\")\n" +
+                "}\n");
+
+        By runCodeButton = By.id("run");
+        driver.findElement(runCodeButton).click();
+
+        wait.until(textToBePresentInElementLocated(By.tagName("body"),
+                "This is only a test!"));
+    }
 }
